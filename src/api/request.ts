@@ -1,5 +1,5 @@
 // src/services/api.ts
-const API_HOST = import.meta.env.VITE_API_HOST || 'http://localhost:8080';
+const API_HOST = import.meta.env.VITE_API_HOST;
 
 interface RequestOptions {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -19,9 +19,11 @@ export async function apiRequest<T = any>(
     endpoint: string,
     options: RequestOptions = {}
 ): Promise<ApiResponse<T>> {
+
+    const isFormData = options.body instanceof FormData;
+
     const { method = 'GET', body, searchParams, headers = {}, signal } = options;
 
-    // Monta URL completa com search params
     const url = new URL(`${API_HOST}${endpoint}`);
     if (searchParams) {
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -29,21 +31,23 @@ export async function apiRequest<T = any>(
         });
     }
 
-    // Monta headers
     const fetchHeaders: HeadersInit = {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...headers,
     };
 
-    // Monta opções do fetch
     const fetchOptions: RequestInit = {
         method,
         headers: fetchHeaders,
         signal,
     };
 
-    if (body && method !== 'GET') {
-        fetchOptions.body = JSON.stringify(body);
+    if (body && method !== 'GET' ) {
+        if(isFormData){
+            fetchOptions.body = body;
+        } else {
+            fetchOptions.body = JSON.stringify(body);
+        }
     }
 
     try {

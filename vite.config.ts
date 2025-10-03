@@ -10,6 +10,13 @@ export default defineConfig({
       key: fs.readFileSync(path.resolve(__dirname, '192.168.93.83+1-key.pem')),
       cert: fs.readFileSync(path.resolve(__dirname, '192.168.93.83+1.pem')),
     },
-    host: true, // permite acesso via IP na rede local
+    host: true, 
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080', // backend Go
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 })

@@ -14,7 +14,7 @@ const LoginForm: React.FC = () => {
     useEffect(() => {
         VerifyAuth(navigate);
     }, []);
-    
+
     const [formData, setFormData] = useState<LoginData
     >({
         email: '',
@@ -36,18 +36,21 @@ const LoginForm: React.FC = () => {
             setMessage({ type: 'error', text: 'Preencha todos os campos.' });
             return;
         }
-        const {data, error, status} = await api.post('/person/login', { email: formData.email, password: formData.password })
+        const { data, error, status } = await api.post('/person/login', { email: formData.email, password: formData.password })
         if (error || status !== 200) {
             if (status === 401 || status === 400) {
                 setMessage({ type: 'error', text: 'Credenciais inválidas.' });
                 return;
             }
-            setMessage({ type: 'error', text: data?.message || 'Erro ao fazer login.' });
+            setMessage({ type: 'error', text: `Erro ao fazer login: ${error}` });
             return;
         }
-    // Salva login no cache por 30 segundos
-    localStorage.setItem('loginCache', JSON.stringify({ email: formData.email, timestamp: Date.now() }));
-    navigate('/feed');
+        if(status === 200 || status === 201){
+            console.log(data)
+            const{id} = JSON.parse(data)
+            localStorage.setItem('login-cache', JSON.stringify({ id: id, timestamp: Date.now() }));
+        }
+        navigate('/feed');
     };
 
     useEffect(() => {
@@ -66,7 +69,7 @@ const LoginForm: React.FC = () => {
             <div className="w-full h-full card bg-white shadow-lg p-10 transition-transform transform hover:scale-[1.01] flex flex-col justify-center">
                 <>
                     <h2 className="text-3xl font-bold text-center mb-6 text-[#25351C]">
-                        Bem-vindo <br/> de volta
+                        Bem-vindo <br /> de volta
                     </h2>
                     {message && (
                         <div

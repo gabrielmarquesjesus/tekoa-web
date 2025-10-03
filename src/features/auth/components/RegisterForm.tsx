@@ -1,8 +1,8 @@
 import React, { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../api/request';
-import { VerifyAuth } from '../services/LoginService';
 import type { RegisterData } from '../../../models/Auth';
+import { VerifyAuth } from '../services/LoginService';
 
 interface Message {
     type: 'success' | 'error';
@@ -38,7 +38,7 @@ const RegisterForm = () => {
         }
         const { data, error, status } = await api.post('/person/register', { ...formData })
         if (error || status !== 200) {
-            setMessage({ type: 'error', text: data?.message || 'Erro ao fazer registro.' });
+            setMessage({ type: 'error', text: 'Erro ao fazer registro: '+error });
             return;
         }
         setMessage({ type: 'success', text: 'Registro bem-sucedido! (Simulado)' });
@@ -99,10 +99,11 @@ const RegisterForm = () => {
                         value={formData.password}
                         onChange={handleChange}
                         className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
-                    />
+                        />
                     <input
                         type="date"
                         name="birthday"
+                        placeholder="Seu aniversário"
                         value={formData.birthday}
                         onChange={handleChange}
                         className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"

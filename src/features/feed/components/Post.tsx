@@ -1,9 +1,5 @@
 import { useMemo } from "react";
-
-export interface Post {
-  image: string;
-  caption: string;
-}
+import type { Post } from "../../../models/Post";
 
 interface PostProps {
   post: Post;
@@ -21,8 +17,8 @@ export default function Post({ post }: PostProps) {
       style={{ transform: rotation }}
     >
       <img
-        src={post.image}
-        alt={post.caption}
+        src={post.images[0].path}
+        alt={post.content}
         className="w-full max-h-74 object-cover"
       />
       <p
@@ -34,7 +30,7 @@ export default function Post({ post }: PostProps) {
           maxWidth: "100%",
         }}
       >
-        {post.caption}
+        {post.content}
       </p>
     </div>
   );
