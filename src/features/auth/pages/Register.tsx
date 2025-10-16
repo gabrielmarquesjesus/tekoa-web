@@ -3,7 +3,7 @@ import RegisterForm from '../components/RegisterForm';
 
 const RegisterPage: React.FC = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tl from-[#93CA74] to-[#C2E9AB] p-10 w-full h-full">
       <RegisterForm />
     </div>
   );

@@ -1,53 +1,33 @@
-import React, { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import React, { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../../../api/request';
-import type { LoginData } from '../../../models/Auth';
-import { VerifyAuth } from '../services/LoginService';
-
-interface Message {
-    type: 'success' | 'error';
-    text: string;
-}
+import Alert from '../../../components/Alert';
+import Input from '../../../components/Input';
+import Modal from '../../../components/Modal';
+import SquareButton from '../../../components/buttons/SquareButton';
+import type { StatusMessage } from '../../../models/StatusMessage';
+import type { LoginData } from '../../../models/features/Auth';
+import { Login } from '../services/LoginService';
 
 const LoginForm: React.FC = () => {
     const navigate = useNavigate();
-    useEffect(() => {
-        VerifyAuth(navigate);
-    }, []);
 
-    const [formData, setFormData] = useState<LoginData
-    >({
-        email: '',
-        password: '',
-        name: '',
-        surname: '',
-        birthday: '',
-    });
-    const [message, setMessage] = useState<Message | null>(null);
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+    const [message, setMessage] = useState<StatusMessage | null>(null);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!formData.email || !formData.password) {
-            setMessage({ type: 'error', text: 'Preencha todos os campos.' });
-            return;
-        }
-        const { data, error, status } = await api.post('/person/login', { email: formData.email, password: formData.password })
-        if (error || status !== 200) {
-            if (status === 401 || status === 400) {
-                setMessage({ type: 'error', text: 'Credenciais inválidas.' });
-                return;
-            }
+        var loginData: LoginData = { email: email, password: password }
+
+        const { data, error, status } = await Login(loginData)
+        if (error) {
             setMessage({ type: 'error', text: `Erro ao fazer login: ${error}` });
             return;
         }
-        if(status === 200 || status === 201){
+        if (status === 200 || status === 201) {
             console.log(data)
-            const{id} = JSON.parse(data)
+            const { id } = JSON.parse(data)
             localStorage.setItem('login-cache', JSON.stringify({ id: id, timestamp: Date.now() }));
         }
         navigate('/feed');
@@ -60,57 +40,35 @@ const LoginForm: React.FC = () => {
         }
     }, [message]);
 
-    const handleToggle = () => {
-        navigate('/register');
-    };
-
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-tl from-[#93CA74] to-[#C2E9AB] p-10 w-full h-full">
-            <div className="w-full h-full card bg-white shadow-lg p-10 transition-transform transform hover:scale-[1.01] flex flex-col justify-center">
-                <>
-                    <h2 className="text-3xl font-bold text-center mb-6 text-[#25351C]">
-                        Bem-vindo <br /> de volta
-                    </h2>
-                    {message && (
-                        <div
-                            role="alert"
-                            className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'} mb-4 transition-all`}
-                        >
-                            <span>{message.text}</span>
-                        </div>
-                    )}
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
-                        />
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Senha"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
-                        />
-                        <button
-                            type="submit"
-                            className="btn w-full border-0 rounded-md bg-gradient-to-r from-[#93CA74] to-[#749D5D] text-white shadow-lg hover:scale-[1.02] transition-transform"
-                        >
-                            Entrar
-                        </button>
-                    </form>
-                    <button
-                        onClick={handleToggle}
-                        className="btn w-full btn-ghost rounded-xl text-[#25351C]"
-                    >
-                        Crie sua conta
-                    </button>
-                </>
-            </div>
+        <div>
+            {message && (
+                <Alert type={message.type} text={message.text} />
+            )}
+            <Modal title="É ótimo te ver de volta!" titleClass="text-2xl">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        type='email'
+                        placeholder='Email'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <Input
+                        type='password'
+                        placeholder='Senha'
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <SquareButton type="submit" text="Entrar" />
+                </form>
+                <SquareButton
+                    text="Crie sua conta"
+                    backgroundHidden={true}
+                    onClick={() => navigate('/register')}
+                />
+            </Modal>
         </div>
     );
 };

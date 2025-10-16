@@ -1,5 +1,5 @@
 // src/services/api.ts
-const API_HOST = import.meta.env.VITE_API_HOST;
+export const API_HOST = import.meta.env.VITE_API_HOST;
 
 interface RequestOptions {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -9,7 +9,7 @@ interface RequestOptions {
     signal?: AbortSignal; // para cancelamento de request
 }
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
     data?: T;
     error?: string;
     status: number;

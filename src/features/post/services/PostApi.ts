@@ -1,5 +1,5 @@
 import { api } from "../../../api/request";
-import type { SimplePostReq } from "../../../models/Post";
+import type { SimplePostReq } from "../../../models/features/Post";
 
 export async function CreatePost(post: SimplePostReq): Promise<Error | null> {
    const formData = new FormData();

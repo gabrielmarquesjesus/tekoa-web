@@ -1,17 +1,54 @@
-import { IoAddCircle } from "react-icons/io5";
+import { IoAddCircle, IoExit } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import BottomNavbar from "../../../components/BottomNavbar";
+import { useEffect, useState } from "react";
+import { api } from "../../../api/request";
+import type { SimplePost } from "../../../models/features/Post";
+import Post from "../components/Post";
+import { Logout } from "../../auth/services/LoginService";
+import ViewScroll from "../../../components/ViewScroll";
 
 export default function Feed() {
     const navigate = useNavigate()
+    const [posts, setPosts] = useState<SimplePost[]>([])
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            const response = await api.get('/posts/simple');
+            if (response.error) {
+                console.error('Error fetching posts:', response.error);
+                return;
+            }
+            if (response.data) {
+                setPosts(response.data as SimplePost[]);
+            }
+        }
+        fetchPosts();
+    }, [])
+
     return (
-        <div className="h-screen flex flex-col bg-[#C2E9AB]/25">
-            <div className="flex-1 overflow-y-auto grid grid-cols-1 gap-6 justify-items-center pt-6 pb-16">
-            </div>
+        <div>
+            <ViewScroll>
+                {posts != undefined && posts.length > 0 ? (
+                    <>
+                        {posts.map((post) => (
+                            <Post key={post.id} post={post} />
+                        ))}
+                    </>
+                ) : (
+                    <div className="flex flex-col text-center">
+                        <p className="text-2xl font-semibold text-[#3c532e]">Ninguém por perto.</p>
+                        <p className="text-md text-[#3c532e]">Mas não se preocupe, você pode ser <br />a primeira semente!.</p>
+                    </div>
+                )}
+            </ViewScroll>
 
             <BottomNavbar
-                items={[
-                    { icon: <IoAddCircle size={28} color="#25351C"/>, onClick: () =>navigate("/post/create") },
+                leftButtons={[
+                    { icon: <IoExit size={28} color="#25351C" />, onClick: () => Logout(navigate) },
+                ]}
+                middleButtons={[
+                    { icon: <IoAddCircle size={28} color="#25351C" />, onClick: () => navigate("/post/create") }
                 ]}
                 activeIndex={0}
             />
