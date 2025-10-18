@@ -1,8 +1,11 @@
-import React, { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import React, { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../api/request';
-import { VerifyAuth } from '../services/LoginService';
-import type { RegisterData } from '../../../models/Auth';
+import Input from '../../../components/Input';
+import SquareButton from '../../../components/buttons/SquareButton';
+import type { RegisterData } from '../../../models/features/Auth';
+import Alert from '../../../components/Alert';
+import Modal from '../../../components/Modal';
 
 interface Message {
     type: 'success' | 'error';
@@ -12,36 +15,32 @@ interface Message {
 const RegisterForm = () => {
 
     const navigate = useNavigate();
-    useEffect(() => {
-        VerifyAuth(navigate);
-    }, []);
-    
-    const [formData, setFormData] = useState<RegisterData>({
-        name: '',
-        surname: '',
-        email: '',
-        password: '',
-        birthday: '',
-    });
-    const [message, setMessage] = useState<Message | null>(null);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+    const [name, setName] = useState("")
+    const [surname, setSurname] = useState("")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [birthday, setBirthday] = useState("")
+
+
+    const [message, setMessage] = useState<Message | null>(null);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!formData.name || !formData.surname || !formData.email || !formData.password || !formData.birthday) {
+        if (!name || !surname || !email || !password || !birthday) {
             setMessage({ type: 'error', text: 'Preencha todos os campos.' });
             return;
         }
-        const { data, error, status } = await api.post('/person/register', { ...formData })
-        if (error || status !== 200) {
-            setMessage({ type: 'error', text: data?.message || 'Erro ao fazer registro.' });
+        const formData: RegisterData = { name, surname, email, password, birthday }
+        const { data, error, status } = await api.post('/person/register', formData)
+        if (error || (status !== 201 && status !== 201)) {
+            setMessage({ type: 'error', text: 'Erro ao fazer registro: ' + error });
             return;
         }
-        setMessage({ type: 'success', text: 'Registro bem-sucedido! (Simulado)' });
+        setMessage({ type: 'success', text: 'Registro bem-sucedido!' });
+        setTimeout(()=>{
+            navigate("/login")
+        }, 1000)
     };
 
     React.useEffect(() => {
@@ -52,75 +51,58 @@ const RegisterForm = () => {
     }, [message]);
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-tl from-[#93CA74] to-[#C2E9AB] p-10 w-full h-full">
-            <div className="w-full h-full card bg-white shadow-lg p-10 transition-transform transform hover:scale-[1.01] flex flex-col justify-center">
-                <h2 className="text-3xl font-bold text-center mb-6 text-[#25351C]">
-                    Crie sua conta
-                </h2>
-                {message && (
-                    <div
-                        role="alert"
-                        className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'} mb-4 transition-all`}
-                    >
-                        <span>{message.text}</span>
-                    </div>
-                )}
+        <div>
+            {message && (
+                <Alert text={message.text} type={message.type} />
+            )}
+            <Modal title='Comece sua jornada!'>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4">
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Nome"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
+                    <Input
+                        placeholder="Nome"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
                         />
-                        <input
-                            type="text"
-                            name="surname"
-                            placeholder="Sobrenome"
-                            value={formData.surname}
-                            onChange={handleChange}
-                            className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
+                    <Input
+                        placeholder="Sobrenome"
+                        value={surname}
+                        onChange={(e) => setSurname(e.target.value)}
+                        required
                         />
-                    </div>
-                    <input
+                    <Input
                         type="email"
-                        name="email"
                         placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
-                    />
-                    <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        />
+                    <Input
                         type="password"
                         name="password"
                         placeholder="Senha"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
-                    />
-                    <input
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        />
+                    <Input
                         type="date"
-                        name="birthday"
-                        value={formData.birthday}
-                        onChange={handleChange}
-                        className="input w-full border-l-[#52733F] border-2 bg-gray-100 dark:text-[#52733F] focus:border-2 focus:border-[#52733F] outline-0"
+                        placeholder="Seu aniversário"
+                        value={birthday}
+                        onChange={(e) => setBirthday(e.target.value)}
+                        required
                     />
-                    <button
+                    <SquareButton
                         type="submit"
-                        className="btn w-full border-0 rounded-md bg-gradient-to-r from-[#93CA74] to-[#749D5D] text-white shadow-lg hover:scale-[1.02] transition-transform"
-                    >
-                        Registrar
-                    </button>
+                        text='Registrar'
+                        onClick={() => handleSubmit}
+                    />
                 </form>
-                <button
+                <SquareButton
+                    text='Fazer login'
                     onClick={() => navigate('/login')}
-                    className="btn w-full btn-ghost rounded-xl text-[#25351C]"
-                >
-                    Fazer login
-                </button>
-            </div>
+                    backgroundHidden={true}
+                />
+            </Modal>
         </div>
     );
 };
