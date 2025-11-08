@@ -1,17 +1,10 @@
 import React, { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Camera from '../../../components/Camera';
+import { IoCamera } from 'react-icons/io5';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DEFAULT_POST, PostCategories, type SimplePostReq } from '../../../models/features/Post';
 import type { StatusMessage } from '../../../models/StatusMessage';
 import PostPreview from '../../feed/components/PostPreview';
 import { CreatePost } from '../services/PostApi';
-import { IoCamera } from 'react-icons/io5';
-import Post from '../../feed/components/Post';
-
-interface FeedbackMessage {
-  type: 'success' | 'error';
-  text: string;
-}
 
 const NewPostForm: React.FC = () => {
   const [content, setContent] = useState<string>('');
@@ -20,9 +13,10 @@ const NewPostForm: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<FeedbackMessage | null>(null);
+  const [message, setMessage] = useState<StatusMessage | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Corrige o problema do teclado cortando a tela em mobile
   useEffect(() => {
@@ -33,6 +27,16 @@ const NewPostForm: React.FC = () => {
       }
     };
 
+    if (location.state?.file) {
+      const file: File = location.state.file;
+      setImageFile(file);
+    }
+
+    if (location.state?.preview) {
+      const preview: string = location.state.preview;
+      setImagePreview(preview);
+    }
+
     window.visualViewport?.addEventListener('resize', handleViewportResize);
     return () => window.visualViewport?.removeEventListener('resize', handleViewportResize);
   }, []);
@@ -42,6 +46,12 @@ const NewPostForm: React.FC = () => {
       console.log('Dispositivos detectados:', devices);
     });
   }, []);
+
+  useEffect(() => {
+    if (isCameraOpen) {
+      navigate("/post/camera");
+    }
+  }, [isCameraOpen])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -83,7 +93,7 @@ const NewPostForm: React.FC = () => {
     navigate("/feed");
   };
   return (
-    <div className='h-screen'>
+    <div className='h-full'>
       {message && (
         <div role="alert" className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'} mb-6 transition-all duration-300`}>
           <span>{message.text}</span>
@@ -140,14 +150,6 @@ const NewPostForm: React.FC = () => {
           </div>
         </div>
       </form>
-
-      <Camera
-        isCameraOpen={isCameraOpen}
-        setImageFile={(file: File) => setImageFile(file)}
-        setImagePreview={(preview: string) => setImagePreview(preview)}
-        setMessage={(message: StatusMessage | null) => setMessage(message)}
-        onStop={() => setIsCameraOpen(false)}
-      />
     </div>
   );
 };

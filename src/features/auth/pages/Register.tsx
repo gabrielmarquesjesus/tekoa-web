@@ -1,9 +1,12 @@
 import React from 'react';
+import useInputFocus from '../../../hooks/useInputFocus';
 import RegisterForm from '../components/RegisterForm';
 
 const RegisterPage: React.FC = () => {
+  useInputFocus();
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tl from-[#93CA74] to-[#C2E9AB] p-10 w-full h-full">
+    <div className="flex flex-col justify-center items-center w-full h-full bg-gradient-to-bl from-[#C2E9AB] to-[#93CA74] p-10">
       <RegisterForm />
     </div>
   );
