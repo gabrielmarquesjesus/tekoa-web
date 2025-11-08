@@ -1,11 +1,11 @@
-import React, { useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../api/request';
+import Alert from '../../../components/Alert';
 import Input from '../../../components/Input';
+import Modal from '../../../components/Modal';
 import SquareButton from '../../../components/buttons/SquareButton';
 import type { RegisterData } from '../../../models/features/Auth';
-import Alert from '../../../components/Alert';
-import Modal from '../../../components/Modal';
 
 interface Message {
     type: 'success' | 'error';
@@ -22,18 +22,16 @@ const RegisterForm = () => {
     const [password, setPassword] = useState("")
     const [birthday, setBirthday] = useState("")
 
-
     const [message, setMessage] = useState<Message | null>(null);
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         if (!name || !surname || !email || !password || !birthday) {
             setMessage({ type: 'error', text: 'Preencha todos os campos.' });
             return;
         }
         const formData: RegisterData = { name, surname, email, password, birthday }
         const { data, error, status } = await api.post('/person/register', formData)
-        if (error || (status !== 201 && status !== 201)) {
+        if (error || (status !== 201 && status !== 200)) {
             setMessage({ type: 'error', text: 'Erro ao fazer registro: ' + error });
             return;
         }
@@ -43,7 +41,7 @@ const RegisterForm = () => {
         }, 1000)
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 3000);
             return () => clearTimeout(timer);
@@ -55,8 +53,8 @@ const RegisterForm = () => {
             {message && (
                 <Alert text={message.text} type={message.type} />
             )}
-            <Modal title='Comece sua jornada!'>
-                <form onSubmit={handleSubmit} className="space-y-4">
+            <Modal title='Comece sua jornada!' extClassName='rounded-md'>
+                <form onSubmit={(e)=>{e.preventDefault();handleSubmit}} className="space-y-4">
                     <Input
                         placeholder="Nome"
                         value={name}

@@ -16,20 +16,20 @@ export async function Login(loginData: LoginData): Promise<ApiResponse<any>> {
     return response;
 }
 
-export function VerifyAuth(navigate: NavigateFunction, route: string) {
-    const cachedLogin = localStorage.getItem('login-cache');
-    if (cachedLogin) {
-        const { timestamp } = JSON.parse(cachedLogin);
-        if (Date.now() - timestamp < 3000000) {
-            navigate(route);
-        } else {
-            localStorage.removeItem('login-cache');
-            navigate('/login');
-        }
-    } else {
-        navigate('/login');
-    }
+export async function VerifyAuth(): Promise<boolean> {
+  const cache = localStorage.getItem("login-cache");
+  if (!cache) return false;
+
+  try {
+    const { timestamp } = JSON.parse(cache);
+    const expired = Date.now() - timestamp > 24 * 60 * 60 * 1000; // exemplo: expira em 24h
+    if (expired) return false;
+    return true;
+  } catch {
+    return false;
+  }
 }
+
 
 export function Logout(navigate: NavigateFunction) {
     localStorage.removeItem('login-cache');
