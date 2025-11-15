@@ -3,13 +3,13 @@ import { IoAddCircle, IoExit } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../../api/request";
 import BottomNavbar from "../../../components/BottomNavbar";
+import Loading from "../../../components/Loading";
 import ViewScroll from "../../../components/ViewScroll";
+import { useLockScroll } from "../../../hooks/useLockBodyScroll";
 import type { SimplePost } from "../../../models/features/Post";
 import { Logout } from "../../auth/services/LoginService";
 import CommentSection from "../components/CommentSection";
 import FeedPost from "../components/FeedPost";
-import { useLockScroll } from "../../../hooks/useLockBodyScroll";
-import Loading from "../../../components/Loading";
 
 export default function Feed() {
     const navigate = useNavigate()
