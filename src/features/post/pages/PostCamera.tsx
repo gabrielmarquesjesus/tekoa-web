@@ -38,7 +38,7 @@ export default function PostCamera({ onCapture, setCameraMessage }: PostCameraPr
                     <h3 className="text-lg font-semibold mt-2">Você</h3>
                 </div>
                 <p
-                    className="text-left text-sm text-gray-700 break-words overflow-hidden"
+                    className="text-left text-sm text-gray-700 wrap-break-word overflow-hidden"
                     style={{
                         display: "-webkit-box",
                         WebkitLineClamp: 6,

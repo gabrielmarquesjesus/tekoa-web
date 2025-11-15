@@ -9,7 +9,6 @@ import PostPreview from '../../feed/components/PostPreview';
 import PostCamera from '../pages/PostCamera';
 import { CreatePost } from '../services/PostApi';
 
-
 export default function NewPostForm() {
   const [content, setContent] = useState<string>('');
   const [category, setCategory] = useState<number>(DEFAULT_POST.value);
@@ -23,14 +22,6 @@ export default function NewPostForm() {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("state", location.state);
-    const handleViewportResize = () => {
-      const viewport = window.visualViewport;
-      if (viewport) {
-        document.body.style.height = `${viewport.height}px`;
-      }
-    };
-
     if (location.state?.file) {
       const file: File = location.state.file;
       setImageFile(file);
@@ -40,22 +31,10 @@ export default function NewPostForm() {
       const preview: string = location.state.preview;
       setImagePreview(preview);
     }
-
-    window.visualViewport?.addEventListener('resize', handleViewportResize);
-    return () => window.visualViewport?.removeEventListener('resize', handleViewportResize);
-  }, []);
-
-  useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then(devices => {
-      console.log('Dispositivos detectados:', devices);
-    });
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    navigator.geolocation.getCurrentPosition((a) => {
-      console.log(a.coords)
-    })
     if (!content.trim() || !category) {
       setMessage({ type: 'error', text: 'Preencha o conteúdo e selecione uma categoria.' });
       return;
@@ -103,7 +82,7 @@ export default function NewPostForm() {
           key="camera-modal"
           initial={{ scale: 1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{duration: 0.4 }}
+          transition={{ duration: 0.4 }}
           className="absolute z-50 flex justify-center items-center inset-0 will-change-transform will-change-opacity"
 
         >
@@ -168,7 +147,7 @@ export default function NewPostForm() {
             <IoCamera color='#25351C' className='w-[15%]' onClick={() => setIsCameraOpen(!isCameraOpen)} size={40} />
             <button
               type="submit"
-              className="btn w-[80%] rounded-xl bg-gradient-to-r from-[#93CA74] to-[#749D5D] text-white shadow-xl transform transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl disabled:bg-gray-400 disabled:text-gray-600"
+              className="btn w-[80%] rounded-xl bg-linear-to-r from-[#93CA74] to-[#749D5D] text-white shadow-xl transform transition-transform duration-300 hover:scale-[1.01] hover:shadow-2xl disabled:bg-gray-400 disabled:text-gray-600"
               disabled={isLoading || !content.trim() || !category}
             >
               {isLoading && <span className="loading loading-spinner"></span>}
