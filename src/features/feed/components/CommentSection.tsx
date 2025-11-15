@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoClose, IoSend } from "react-icons/io5";
 import Input from "../../../components/Input";
 import ViewScroll from "../../../components/ViewScroll";
@@ -11,6 +11,8 @@ interface CommentSectionProps {
 
 export default function CommentSection({ isOpen: isOpenProp, onClose }: CommentSectionProps) {
   const [isVisible, setIsVisible] = useState(false);
+
+  const commentScrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isOpenProp) {
@@ -37,22 +39,22 @@ export default function CommentSection({ isOpen: isOpenProp, onClose }: CommentS
   return (
     <div
       className={`h-full w-full bg-[#3c532e]/50 absolute z-50 bottom-0 inset-0 flex justify-center items-end 
-      ${isOpenProp ? "animate-fade-in" : "animate-fade-out"}`}
+      ${isOpenProp ? "animate-fade-in" : "animate-fade-out"} overflow-hidden`}
     >
       <div
-        className={`w-full max-h-[70%] bg-white shadow-2xl shadow-black rounded-tr-4xl rounded-tl-4xl px-5 pt-5 flex flex-col
+        className={`w-full max-h-[70%] bg-white shadow-2xl shadow-black rounded-tr-2xl rounded-tl-2xl px-5 pt-3 flex flex-col
         ${isOpenProp ? "animate-slide-up" : "animate-slide-down"}`}
       >
-        <header className="flex mb-5">
+        <header className="flex relative mb-5 justify-between">
           <h3 className="text-center font-medium text-md text-[#3c532e]">Cometários</h3>
           <button
-            className="absolute top-4 right-4 text-black"
+            className="text-black"
             onClick={onClose}
           >
             <IoClose size={25} color="#3c532e" />
           </button>
         </header>
-        <ViewScroll background="bg-white" classNameExt="overflow-y-auto max-h-[70%]">
+        <ViewScroll ref={commentScrollRef} background="bg-white" classNameExt="overflow-y-auto max-h-[70%] ">
           {commentList?.map((comment) => (
             <div
               key={comment.id}

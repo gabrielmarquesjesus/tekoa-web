@@ -1,12 +1,16 @@
-import React, { useEffect, useState, type FormEvent } from 'react';
+import { motion } from 'framer-motion';
+import { useEffect, useState, type FormEvent } from 'react';
 import { IoCamera } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Modal from '../../../components/Modal';
 import { DEFAULT_POST, PostCategories, type SimplePostReq } from '../../../models/features/Post';
 import type { StatusMessage } from '../../../models/StatusMessage';
 import PostPreview from '../../feed/components/PostPreview';
+import PostCamera from '../pages/PostCamera';
 import { CreatePost } from '../services/PostApi';
 
-const NewPostForm: React.FC = () => {
+
+export default function NewPostForm() {
   const [content, setContent] = useState<string>('');
   const [category, setCategory] = useState<number>(DEFAULT_POST.value);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -18,8 +22,8 @@ const NewPostForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Corrige o problema do teclado cortando a tela em mobile
   useEffect(() => {
+    console.log("state", location.state);
     const handleViewportResize = () => {
       const viewport = window.visualViewport;
       if (viewport) {
@@ -46,12 +50,6 @@ const NewPostForm: React.FC = () => {
       console.log('Dispositivos detectados:', devices);
     });
   }, []);
-
-  useEffect(() => {
-    if (isCameraOpen) {
-      navigate("/post/camera");
-    }
-  }, [isCameraOpen])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -98,6 +96,35 @@ const NewPostForm: React.FC = () => {
         <div role="alert" className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'} mb-6 transition-all duration-300`}>
           <span>{message.text}</span>
         </div>
+      )}
+
+      {isCameraOpen && (
+        <motion.div
+          key="camera-modal"
+          initial={{ scale: 1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{duration: 0.4 }}
+          className="absolute z-50 flex justify-center items-center inset-0 will-change-transform will-change-opacity"
+
+        >
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-md transition-opacity duration-300 opacity-100" />
+
+          <motion.div
+            initial={{ scale: 1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="relative z-10 h-full"
+          >
+
+            <Modal backgroundColor='transparent'>
+              <PostCamera onCapture={(file, preview) => {
+                setImageFile(file);
+                setImagePreview(preview);
+                setIsCameraOpen(false);
+              }} setCameraMessage={setMessage} />
+            </Modal>
+          </motion.div>
+        </motion.div>
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col justify-between h-full w-screen">
@@ -153,5 +180,3 @@ const NewPostForm: React.FC = () => {
     </div>
   );
 };
-
-export default NewPostForm;

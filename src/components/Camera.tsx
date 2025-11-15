@@ -11,15 +11,10 @@ export interface CameraProps {
     onCapture: (file: File, preview: string) => void;
     setMessage: (message: StatusMessage | null) => void;
     onStop?: () => void;
+    onLoad?: () => void;
 }
-
-/**
- * Camera — Componente Headless (sem UI)
- * - controla câmera e captura, mas NÃO define layout ou botões
- * - expõe métodos via ref: capture(), stop()
- */
 const Camera = forwardRef<CameraHandle, CameraProps>(
-    ({ isCameraOpen, onCapture, setMessage, onStop }, ref) => {
+    ({ isCameraOpen, onCapture, setMessage, onStop, onLoad }, ref) => {
         const videoRef = useRef<HTMLVideoElement | null>(null);
         const canvasRef = useRef<HTMLCanvasElement | null>(null);
         const streamRef = useRef<MediaStream | null>(null);
@@ -41,9 +36,14 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { ideal: "environment" } },
+                    video: {
+                        facingMode: { ideal: "environment" },
+                        width: { ideal: 4096 }, 
+                        height: { ideal: 2160 },
+                    },
                     audio: false,
                 });
+
 
                 streamRef.current = stream;
                 const video = videoRef.current;
@@ -52,8 +52,15 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
                 video.srcObject = stream;
                 video.muted = true;
                 video.setAttribute("playsinline", "true");
-
-                try { await video.play(); } catch { }
+                if (onLoad) {
+                    onLoad()
+                }
+                try {
+                    await video.play();
+                    if (onLoad) {
+                        onLoad()
+                    }
+                } catch { }
             } catch (err: any) {
                 const text =
                     err?.name === "NotAllowedError"
@@ -96,10 +103,9 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
                 const file = new File([blob], "captura.jpg", { type: "image/jpeg" });
                 onCapture(file, preview);
                 stop();
-            }, "image/jpeg", 0.9);
+            }, "image/jpeg", 1.0);
         }
 
-        // expõe os métodos para o parent
         useImperativeHandle(ref, () => ({ capture, stop }));
 
         return (

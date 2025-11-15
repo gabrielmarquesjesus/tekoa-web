@@ -11,8 +11,8 @@ interface ModalProps {
 export default function Modal({ title, titleClass, children, backgroundColor, extClassName }: ModalProps) {
   return (
     <div
-      className={`w-full max-w-sm bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-center items-center ${
-        backgroundColor || ''
+      className={`w-full max-w-sm  rounded-2xl shadow-lg p-6 flex flex-col justify-center items-center ${
+        backgroundColor || 'bg-white'
       } ${extClassName || ''}`}
     >
       {title && (

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { type SimplePost } from "../../../models/features/Post";
-import Post from "./Post";
 import { createPortal } from "react-dom";
+import { type SimplePost } from "../../../models/features/Post";
+import Post from "./FeedPost";
 interface PostPreviewProps {
     imagePreview: string; // base64 da imagem
     content: string;
@@ -32,13 +32,12 @@ export default function PostPreview({ imagePreview, content, category, onRemove 
                     alt="Prévia"
                     className="w-14 h-14 object-cover border border-gray-300 shadow-sm"
                 />
-
             </div>
 
             {isOpen && createPortal(
                 <div className="fixed inset-0 bg-black/70 z-[999]">
                     <div className="h-full flex flex-col justify-center items-center space-y-20">
-                        <Post post={fakePost} />
+                        <Post post={fakePost} onOpenComment={()=>{}}/>
                         <button className="btn bg-[#749D5D] border-none rounded-xl" onClick={() => setIsOpen(false)}>Fechar</button>
                     </div>
                 </div>,

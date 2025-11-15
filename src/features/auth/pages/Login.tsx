@@ -6,7 +6,7 @@ const LoginPage: React.FC = () => {
   useInputFocus();
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full overflow-auto p-10 bg-gradient-to-tl from-[#93CA74] to-[#C2E9AB]">
+    <div className="flex flex-col items-center justify-center w-full h-screen overflow-auto px-10 bg-gradient-to-tl from-[#93CA74] to-[#C2E9AB]">
       <LoginForm />
     </div>
   );

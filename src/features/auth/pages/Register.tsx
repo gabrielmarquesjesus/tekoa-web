@@ -6,7 +6,7 @@ const RegisterPage: React.FC = () => {
   useInputFocus();
 
   return (
-    <div className="flex flex-col justify-center items-center w-full h-full bg-gradient-to-bl from-[#C2E9AB] to-[#93CA74] p-10">
+    <div className="flex flex-col justify-center items-center w-full h-screen bg-gradient-to-bl from-[#C2E9AB] to-[#93CA74] p-10">
       <RegisterForm />
     </div>
   );

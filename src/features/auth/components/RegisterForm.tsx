@@ -54,7 +54,7 @@ const RegisterForm = () => {
                 <Alert text={message.text} type={message.type} />
             )}
             <Modal title='Comece sua jornada!' extClassName='rounded-md'>
-                <form onSubmit={(e)=>{e.preventDefault();handleSubmit}} className="space-y-4">
+                <form onSubmit={(e)=>{e.preventDefault();handleSubmit()}} className="space-y-4">
                     <Input
                         placeholder="Nome"
                         value={name}
