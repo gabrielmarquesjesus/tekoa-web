@@ -1,0 +1,9 @@
+node_modules/
+dist/
+certs/
+*.log
+*.pem
+.env
+*.env
+*.exe
+public/assets/*.exe
