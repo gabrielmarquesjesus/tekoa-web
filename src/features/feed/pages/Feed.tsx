@@ -18,7 +18,7 @@ export default function Feed() {
     const [loading, setLoading] = useState<boolean | null>(true)
 
     useEffect(() => {
-        setLoading(true)
+        setLoading(true);
         const fetchPosts = async () => {
             const response = await api.get('/posts/simple');
             if (response.error) {
@@ -32,8 +32,6 @@ export default function Feed() {
             }
         }
         fetchPosts();
-        const intervalId = setInterval(fetchPosts, 200); // Atualiza a cada 60 segundos
-        return () => clearInterval(intervalId);
     }, [])
 
     const scrollRef = useRef<HTMLDivElement>(null);
